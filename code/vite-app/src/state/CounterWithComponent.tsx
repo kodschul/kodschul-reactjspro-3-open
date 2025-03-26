@@ -5,6 +5,10 @@ const CounterComponent = ({ initialCount }) => {
   console.log("CounterComponent", initialCount);
   const [count, setCount] = useState(initialCount);
 
+  useEffect(() => {
+    setCount(initialCount);
+  }, [initialCount]);
+
   // if (count != initialCount) {
   //   setCount(initialCount);
   // }
