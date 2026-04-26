@@ -1,10 +1,12 @@
-# Modul 4: Formulare mit React Hook Form und Zod
+# Modul 4: Forms neu gedacht — react-hook-form und zod
+
+> Hinweis: Da das Team derzeit ausschliesslich auf react-hook-form und zod setzt, liegt der Schwerpunkt dieses Moduls auf diesen beiden Werkzeugen. React 19 Actions werden nur kurz eingeordnet, sind aber nicht der Fokus.
 
 ---
 
-## Lab 4.1 — Form-Architektur verstehen
+## Lab 4.1 — Warum klassische Controlled Forms oft Overkill sind
 
-### Das Problem mit klassischen Controlled Forms
+### Das Problem
 
 ```tsx
 // Jedes Tastenereignis rendert die gesamte Komponente neu
@@ -33,7 +35,7 @@ function LoginForm() {
 }
 ```
 
-### Erstes Beispiel mit React Hook Form
+### Erstes Beispiel mit react-hook-form
 
 ```tsx
 import { useForm } from 'react-hook-form';
@@ -75,9 +77,9 @@ function LoginForm() {
 
 ---
 
-## Lab 4.2 — Validierung mit Zod
+## Lab 4.2 — Validierung mit zod
 
-### Zod Grundlagen
+### zod Grundlagen
 
 ```tsx
 import { z } from 'zod';
@@ -95,7 +97,6 @@ const userSchema = z.object({
 
 // TypeScript-Typ aus Schema ableiten
 type User = z.infer<typeof userSchema>;
-// entspricht: { name: string; email: string; age: number }
 ```
 
 ### Komplexere Validierung
@@ -126,12 +127,12 @@ const registrationSchema = z.object({
 
 ---
 
-## Lab 4.3 — React Hook Form und Zod kombinieren
+## Lab 4.3 — react-hook-form und zod kombinieren
 
 ### Installation und Resolver
 
 ```bash
-npm install @hookform/resolvers
+npm install react-hook-form zod @hookform/resolvers
 ```
 
 ```tsx
@@ -173,7 +174,15 @@ function LoginForm() {
 }
 ```
 
-### Fehlerzustände sinnvoll gestalten
+### Validierungsmodi
+
+| Modus | Wann wird validiert |
+|---|---|
+| onSubmit | Nur beim Absenden (Standard) |
+| onTouched | Wenn ein Feld verlassen wurde |
+| onChange | Bei jeder Aenderung |
+| onBlur | Beim Verlassen des Feldes |
+| all | Bei Aenderung und Verlassen |
 
 ```tsx
 const {
@@ -182,10 +191,9 @@ const {
   formState: { errors, touchedFields },
 } = useForm<FormData>({
   resolver: zodResolver(schema),
-  mode: 'onTouched', // validiert erst wenn das Feld verlassen wurde
+  mode: 'onTouched',
 });
 
-// Fehler nur anzeigen wenn das Feld beruehrt wurde
 {touchedFields.email && errors.email && (
   <p>{errors.email.message}</p>
 )}
@@ -241,7 +249,59 @@ function RegistrationForm() {
 
 ---
 
-## Lab 4.4 — Bestehende Formulare modernisieren
+## Lab 4.4 — Optimistic UI
+
+### Optimistic Update Muster mit react-query
+
+```tsx
+function useToggleFavorite() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (productId: string) =>
+      fetch(`/api/products/${productId}/favorite`, { method: 'POST' }),
+
+    onMutate: async (productId) => {
+      await queryClient.cancelQueries({ queryKey: ['product', productId] });
+
+      const previous = queryClient.getQueryData(['product', productId]);
+
+      queryClient.setQueryData(['product', productId], (old: Product) => ({
+        ...old,
+        isFavorite: !old.isFavorite,
+      }));
+
+      return { previous };
+    },
+
+    onError: (err, productId, context) => {
+      queryClient.setQueryData(['product', productId], context?.previous);
+    },
+
+    onSettled: (data, error, productId) => {
+      queryClient.invalidateQueries({ queryKey: ['product', productId] });
+    },
+  });
+}
+```
+
+### Wann Optimistic UI sinnvoll ist und wann nicht
+
+```
+Sinnvoll wenn:
+  Operation hat hohe Erfolgswahrscheinlichkeit (Like, Favorit, einfaches Update)
+  Nutzer wuerde sonst auf Netzwerk warten
+  Rollback bei Fehler ist visuell akzeptabel
+
+Nicht sinnvoll wenn:
+  Operation kann oft fehlschlagen (Bezahlung, Reservierung)
+  Konsistenz wichtiger ist als Geschwindigkeit
+  Andere Nutzer das Ergebnis sehen muessen
+```
+
+---
+
+## Lab 4.5 — Klassisches Formular auf moderne Patterns umbauen
 
 ### Typisches Legacy-Formular
 
@@ -324,3 +384,18 @@ function ProfileForm({ user }: { user: User }) {
   );
 }
 ```
+
+---
+
+## Kurzer Ausblick: React 19 Form-Hooks
+
+Auch wenn das Team aktuell auf react-hook-form setzt, hier eine kurze Einordnung der React 19 Form-APIs zum gemeinsamen Verständnis:
+
+| Anforderung | React 19 nativ | react-hook-form + zod |
+|---|---|---|
+| Pending-State im Submit-Button | useFormStatus() | formState.isSubmitting |
+| Submit mit Server-Logik | useActionState + form action | handleSubmit(onSubmit) |
+| Optimistic Update | useOptimistic() | Manuell oder via react-query |
+| Field-Level Validierung | Manuell oder via Library | register + zod Schema |
+| Performance bei grossen Formularen | Durchschnittlich (controlled) | Sehr gut (uncontrolled Default) |
+| Schema-basierte TS-Typen | Nicht eingebaut | z.infer<typeof schema> |
