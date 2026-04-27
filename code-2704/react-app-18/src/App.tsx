@@ -5,8 +5,10 @@ import { ConcurrentRenderDemo } from "./demos/ConcurrentRenderDemo";
 import { AutoBatchingDemo } from "./demos/AutoBatchingDemo";
 import { DataFetchDemo } from "./demos/DataFetchDemo";
 import { ManualFormDemo } from "./demos/ManualFormDemo";
+import Countdown from "./demos/Countdown";
 
 const DEMOS = [
+  { id: "countdown", label: "countdown", component: Countdown },
   {
     id: "blocking",
     label: "Blocking Render (Problem)",

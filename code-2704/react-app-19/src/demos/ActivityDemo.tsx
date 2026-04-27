@@ -1,4 +1,4 @@
-import { useState, Activity } from "react";
+import { useState, Activity, useEffect } from "react";
 import {
   Alert,
   AlertTitle,
@@ -12,6 +12,10 @@ import {
 
 // Simulates an expensive widget whose effects should pause when hidden
 function ExpensiveWidget({ label }: { label: string }) {
+  useEffect(() => {
+    console.log("rendered", new Date(), label);
+  }, []);
+
   return (
     <Box
       sx={{
@@ -95,6 +99,8 @@ export function ActivityDemo() {
       <Activity mode={activeTab === "drafts" ? "visible" : "hidden"}>
         <ExpensiveWidget label="Drafts Tab" />
       </Activity>
+
+      {/* {activeTab === "drafts" ? <ExpensiveWidget label="Drafts Tab" /> : null} */}
     </Box>
   );
 }

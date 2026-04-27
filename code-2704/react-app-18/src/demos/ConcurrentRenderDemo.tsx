@@ -20,7 +20,7 @@ function filterItems(query: string) {
     .slice(0, 20);
 }
 
-export function ConcurrentRenderDemo1() {
+export function ConcurrentRenderDemo() {
   const [text, setText] = useState("");
   const [list, setList] = useState(
     Array.from({ length: 10_000 }, (_, i) => "item" + i)
@@ -39,13 +39,15 @@ export function ConcurrentRenderDemo1() {
 
     // setList(Array.from({ length: 10_000 }, (_, i) => value + i));
 
-    console.log("len_before:", list.length);
-    startTransition(() => {
-      // non-urgent (can be delayed)
-      // @ts-ignore
-      console.log("lef_after:", list.length + 1);
-      setList([...list, value]);
-    });
+    console.log("lef_after:", list.length + 1);
+    setList([...list, value]);
+
+    // console.log("len_before:", list.length);
+    // startTransition(() => {
+    //   // non-urgent (can be delayed)
+    //   // @ts-ignore
+
+    // });
   }
 
   return (
@@ -60,7 +62,7 @@ export function ConcurrentRenderDemo1() {
 }
 
 // without deffered lagging
-export function ConcurrentRenderDemo11() {
+export function ConcurrentRenderDemo222() {
   const [text, setText] = useState("");
 
   const list = Array.from({ length: 10_000 }, (_, i) => `Item ${i}`).filter(
@@ -81,7 +83,7 @@ export function ConcurrentRenderDemo11() {
 }
 
 // with deffered not lagging
-export function ConcurrentRenderDemo() {
+export function ConcurrentRenderDemo22() {
   const [text, setText] = useState("");
 
   // 🔑 deferred version of input

@@ -17,9 +17,10 @@ function filterItems(query: string) {
   while (performance.now() - start < 30) {
     // busy-wait 30 ms to simulate expensive render
   }
-  return Array.from({ length: 10_000 }, (_, i) => `Item ${i + 1}`)
-    .filter((item) => item.toLowerCase().includes(query.toLowerCase()))
-    .slice(0, 20);
+  return Array.from({ length: 10_000 }, (_, i) => `Item ${i + 1}`).filter(
+    (item) => item.toLowerCase().includes(query.toLowerCase())
+  );
+  // .slice(0, 20);
 }
 
 export function BlockingRenderDemo() {
