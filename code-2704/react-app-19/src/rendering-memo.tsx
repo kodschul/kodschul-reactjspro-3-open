@@ -1,49 +1,27 @@
-import React, { useEffect, useMemo, useState } from "react";
-
-const expensiveFunc = (text) => {
-  // await new Promise((r) => setTimeout(r, 2000));
-  console.log("expensiveFunc called");
-
-  let i = 0;
-
-  while (i < 10e8) {
-    Math.pow(
-      Math.pow(Math.pow(10e9, Math.pow(10e9, 10e9)), Math.pow(10e9, 10e9)),
-      Math.pow(10e9, 10e9)
-    );
-    i += 1;
-  }
-  return "Calculated: " + text;
-};
+import React, { useEffect, useState } from "react";
 
 function RenderingApp() {
-  "use no memo";
-
   console.log("Parent RENDERED!");
 
   const [count, setCount] = useState(0);
   const [isVisible, setVisible] = useState(true);
 
-  const result = useMemo(() => expensiveFunc(count), [count]);
-
-  // const result = expensiveFunc(count);
-
-  console.log({ result });
+  // const navigationCachedFunc = ;
 
   return (
     <div>
       RenderingApp
       <button onClick={() => setCount(count + 1)}>{count}</button>
       <button onClick={() => setVisible(!isVisible)}>Toggle</button>
-      <Child />
+      <Child navigation={() => null} count={count} />
     </div>
   );
 }
 
-const Child = () => {
+const Child = ({ count }) => {
   // const [childCount, setChildCount] = useState(count);
 
-  console.log("Child RENDERED!");
+  console.log("Child RENDERED!", count);
 
   // console.log("Child RENDERED!", {
   //   childCount,

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 
 type Character = {
   id: string;
@@ -11,7 +11,7 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(false);
 
   const slow = async (queryNum) => {
-    await new Promise((r) => setTimeout(r, queryNum == 1 ? 3000 : 500));
+    // await new Promise((r) => setTimeout(r, queryNum == 1 ? 3000 : 500));
   };
 
   useEffect(() => {

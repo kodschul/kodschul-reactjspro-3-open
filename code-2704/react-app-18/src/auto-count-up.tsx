@@ -10,7 +10,6 @@ function AutoCountUp() {
   useEffect(() => {
     if (isRunning) {
       //   console.log({ count });
-
       console.log("create a new interval");
       timerRef.current = setInterval(() => {
         //   console.log("INCR:", count + 1);

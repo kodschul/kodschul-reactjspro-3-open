@@ -17,16 +17,12 @@ const expensiveFunc = (text) => {
 };
 
 function RenderingApp() {
-  "use no memo";
-
   console.log("Parent RENDERED!");
 
   const [count, setCount] = useState(0);
   const [isVisible, setVisible] = useState(true);
 
   const result = useMemo(() => expensiveFunc(count), [count]);
-
-  // const result = expensiveFunc(count);
 
   console.log({ result });
 
